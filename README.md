@@ -15,7 +15,7 @@
 
 - [Overview](#overview)
 - [Datasets](#datasets)
-- [MLOps Pipeline](#mlops-pipeline)
+- [Model Workflow](#model-workflow)
 - [Setup & Installation](#setup--installation)
     - [Clone repo](#step-1-clone-the-repository)
     - [Create Virtual Environment](#step-2-create-virtual-environment)
@@ -63,9 +63,9 @@ The main dataset used is [zoo_animals_data.csv](./zoo_animals_data.csv), which c
 | class_name   | Class name (label)    |
 
 
-## MLOps Pipeline
+## Model Workflow
 
-<img src="./assets//classifier-arch-new.jpg" alt="mlops architecture" />
+<img src="./assets//classifier-arch-new.jpg" alt="model workflow" />
 
 
 ## Project Structure
@@ -73,22 +73,29 @@ The main dataset used is [zoo_animals_data.csv](./zoo_animals_data.csv), which c
 ```bash
 
 classifier_model
-|__ assets/*                         # miscellenous files for readme.md
+|__ venv/                              # virtual env
 |__ datasets/
-  |__ preprocessed_data.csv          # save preprocessed data for testing
-  |__ zoo_animal_data.csv            # original dataset
+    |__ zoo_data.csv                   # original zoo dataset
+    |__ class.csv                      # original class name dataset
+    |__ final_dataset.csv              # final dataset for model
+|__ feature_store/
+    |__ preprocessed_data.csv          # save preprocessed data for testing
+    |__ feature_names.pkl              # save feature_names for testing
 |__ models/
-  |__ classifier_model.pkl           # saved model in .pkl
-  |__ feature_names.pkl              # save feature_names for testing
+    |__ classifier_model.pkl           # saved model in .pkl
+|__ logs/*                             # logs for hyperparamter tuning values
 |__ src/
-  |__ model.py                       # model training file
-  |__ test_model.py                  # to test model
-|__ logs/*                           # logs for hyperparamter tuning values
-|__ requirements.txt                 # install dependency pacakges
-|__ README.md    
-|__ LICENCE
-|__ CONTRIBUTION.md                    
-
+  |__ index.py                         # main file to run
+  |__ data_piepline/                   # data_pipeline folder
+      |__ data_*.py
+      |__ index.py
+  |__ model_pipeline/                  # model_pipeline folder
+      |__ mdoel_*.py
+      |__ index.py
+  |__ test_model.py                    # to test model
+|__ requirements.txt                   # install dependency pacakges
+|__ README.md     
+                 
 ```
 
 
@@ -97,6 +104,7 @@ classifier_model
 - **Machine Learning**: scikit-learn
 - **Type of Machine Learning**: Supervised ML
 - **Visual Charts**: matplotlib, seaborn
+- **data validation**: pandera
 - **Save model**: joblib
 
 
@@ -136,21 +144,32 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-#### Step-4: Training the Model
+#### Step-4: Run the Model
 
-Run [`model.py`](./model.py) to train the classifier and save the model:
+Run [`index.py`](./src/index.py) to load data, preprocess data, train and save the model.
 
 ```bash
 cd src
-
-python model.py
+python index.py
 ```
+
+**Flow of Code Run**
+
+```bash
+index.py -> data_pipeline.py     ->  model_pipeline.py
+              |__ data_ingestion       |__ model_train
+              |__ data_validation      |__ model_evaluation
+              |__ data_eda             |__ model_validation
+              |__ feature_engg         |__ model_tuning
+              |__ data_preprocess
+
 
 #### Step-5: Testing/Prediction
 
-Run [`test_model.py`](./test_model.py) to make predictions. If 'animal' is not found, you will be prompted to enter animal features, and the model will predict the class:
+Run [`test_model.py`](./src/test_model.py) to make predictions. If 'animal' is not found, you will be prompted to enter animal features, and the model will predict the class:
 
 ```bash
+cd src
 python test_model.py
 ```
 
